@@ -36,9 +36,9 @@ One install. Five capabilities.
 **Manual:**
 ```bash
 mkdir -p .claude/skills/gemini/scripts .claude/skills/gemini/references
-curl -sL https://raw.githubusercontent.com/awrshift/skill-gemini/main/skills/gemini/SKILL.md \
+curl -sL https://raw.githubusercontent.com/awrshift/skill-gemini/main/SKILL.md \
   -o .claude/skills/gemini/SKILL.md
-curl -sL https://raw.githubusercontent.com/awrshift/skill-gemini/main/skills/gemini/scripts/gemini.py \
+curl -sL https://raw.githubusercontent.com/awrshift/skill-gemini/main/scripts/gemini.py \
   -o .claude/skills/gemini/scripts/gemini.py
 ```
 
