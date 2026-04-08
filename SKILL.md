@@ -41,14 +41,14 @@ python3 $GEMINI analyze "revenue data shows..." --context "Q1 report"
 python3 $GEMINI extract "Parse this invoice..." --json-mode
 ```
 
-| Command | Model | Best for |
-|---------|-------|----------|
-| `ask` | Flash | Quick questions, general tasks |
-| `second-opinion` | Pro | Decisions, validation, critical review |
-| `think` | Pro (high thinking) | Complex reasoning, architecture |
-| `review` | Flash | Code quality, bugs |
-| `analyze` | Flash | Data patterns, CSV analysis |
-| `extract` | Flash | Structured JSON from text |
+| Command | Default Model | System Instruction | Use When |
+|---------|---------------|-------------------|----------|
+| `ask` | 3-flash-preview | none | Quick questions, general tasks |
+| `second-opinion` | **3.1-pro-preview** | Critical reviewer | Decisions, validation, critical review |
+| `think` | **3.1-pro-preview** (high thinking) | none | Complex reasoning, architecture |
+| `review` | 3-flash-preview | Code reviewer | Code quality, bugs |
+| `analyze` | 3-flash-preview | Data analyst | Data patterns, CSV analysis |
+| `extract` | 3-flash-preview | JSON extractor | Structured JSON from text |
 
 ## 2. Web-Grounded Answers
 
@@ -66,7 +66,25 @@ python3 $GEMINI ask "Compare Drizzle vs Prisma pricing 2026" \
   -m gemini-3.1-flash-lite-preview --grounded --save research.md
 ```
 
-## 3. Image Generation
+## 3. Multimodal — Images as Input
+
+Use `--image` / `-i` (repeatable) to send images with any command:
+
+```bash
+# Describe a screenshot
+python3 $GEMINI ask "Describe this UI" --image screenshot.png
+
+# Compare designs (multiple images)
+python3 $GEMINI second-opinion "Compare designs" --image site.png --image ref.png --save review.md
+
+# Visual QA with file prompt
+python3 $GEMINI second-opinion @prompt.txt --image site.png --image reference.png --save review.md
+```
+
+Supported: PNG, JPEG, WebP, GIF. Max ~20MB total. Gemini 3.x is natively multimodal.
+Use cases: design review, visual QA, screenshot diff, accessibility audit.
+
+## 4. Image Generation
 
 Generate images via Gemini Nano Banana models. Requires `mcp__gemini-sdk__gemini_image` MCP tool.
 
@@ -81,7 +99,7 @@ The skill uses Gemini Flash Image (fast) or Pro Image (quality). Supports 14 asp
 
 For **code-to-diagram** generation, see the Visualize workflow below.
 
-## 4. Visualize — Code to Diagrams
+## 5. Visualize — Code to Diagrams
 
 Turn any codebase into professional diagrams. Three phases: Gather → Synthesize → Render.
 
@@ -102,7 +120,7 @@ Turn any codebase into professional diagrams. Three phases: Gather → Synthesiz
 
 For detailed gathering strategies and prompt templates, read `references/visualize.md`.
 
-## 5. Brainstorm — 3-Round Claude x Gemini
+## 6. Brainstorm — 3-Round Claude x Gemini
 
 Structured adversarial dialogue. Flash researches facts, Pro reasons on them, Claude orchestrates.
 
@@ -116,18 +134,33 @@ Structured adversarial dialogue. Flash researches facts, Pro reasons on them, Cl
 
 For the full protocol with prompt templates, read `references/brainstorm.md`.
 
-## Common Arguments
+## Arguments
 
 | Arg | Short | Description |
 |-----|-------|-------------|
 | `--model` | `-m` | Override model (e.g., `gemini-3.1-flash-lite-preview`) |
-| `--context` | `-c` | Additional context |
-| `--grounded` | `-g` | Enable Google Search grounding |
+| `--context` | `-c` | Additional context (second-opinion, analyze) |
+| `--grounded` | `-g` | Enable Google Search grounding — Gemini searches the web before answering |
 | `--save` | | Save response to file |
-| `--thinking` | `-t` | Level: minimal/low/medium/high |
+| `--thinking` | `-t` | Level: minimal/low/medium/high (Gemini 3.x) |
 | `--json-mode` | | Force structured JSON output |
-| `--temp` | | Temperature (default 1.0 — keep default for Gemini 3) |
-| `@file` | | Read prompt from file |
+| `--image` | `-i` | Attach image file (repeatable for multiple images) |
+| `--system` | `-s` | Override system instruction |
+| `--temp` | | Temperature: 0.0-2.0 (default 1.0, **keep default for Gemini 3**) |
+| `--top-p` | | Top-p nucleus sampling: 0.0-1.0 (default 0.95) |
+| `--top-k` | | Top-k sampling (default ~40) |
+| `--max-tokens` | | Max output tokens: 1-65536 (default model max 64K) |
+| `--seed` | | Seed for reproducible output |
+| `--focus` | | Focus area for review |
+| `--json` | | Raw JSON output (for piping) |
+| `@file` | | Read prompt from file instead of inline |
+
+## Key Parameter Rules (Gemini 3)
+
+- **Temperature 1.0 is mandatory** — Google strongly recommends keeping default. Lower values cause looping/degradation in reasoning tasks.
+- **thinking_level replaces thinking_budget** — Do NOT combine both (→ error). Pro: low/medium/high. Flash: minimal/low/medium/high.
+- **JSON mode** — Use `--json-mode` for guaranteed valid JSON output.
+- **Grounding is a Tool** — `--grounded` adds Google Search as a tool, not a parameter.
 
 ## Models (March 2026)
 
@@ -142,10 +175,13 @@ For full model specs, read `references/models.md`.
 ## Critical Evaluation Rule
 
 Gemini's output is INPUT for decisions, not the decision itself. After every call:
-1. Challenge each recommendation — fact or speculation?
-2. Check for missing context — Gemini doesn't see your codebase
-3. Verify numbers — predictions are estimates, not measurements
-4. Present both views to user — "Gemini said / My evaluation / Reason"
+1. **Challenge each recommendation** — is this fact or speculation?
+2. **Check for missing context** — Gemini doesn't see codebase, prior decisions, or constraints
+3. **Verify numbers** — predictions like "90% speedup" are estimates, not measurements
+4. **Look for blind spots** — implementation complexity, side effects, existing code
+5. **Present critical assessment to user** — "Gemini said / My evaluation / Reason" table
+
+**Workflow:** Gemini recommends → Claude evaluates critically → present BOTH to user → user decides
 
 ## Parallel Execution
 
