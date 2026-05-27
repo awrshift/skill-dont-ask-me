@@ -36,26 +36,13 @@ This skill puts a second AI in the loop *before* you. Claude asks Gemini (differ
 
 ---
 
-## Four ways to use it
+## Three ways to use it
 
 You don't pick the mode — Claude picks it based on what you type. Here's what each looks like.
 
-### 1. "Just check this fact" → Quick Web Check
+> **Not in scope:** factual lookups ("what's the latest X version?", "is Y still free?") — use Claude Code's native WebSearch tool for those. This skill is about critique and adversarial review, not fact retrieval.
 
-You type something like:
-> *"Is Next.js 16 still in beta?"*
-> *"What's the current GDPR fine for missing consent?"*
-> *"Has Anthropic released Opus 5 yet?"*
-
-**What happens:** Claude asks Gemini with live Google Search enabled. Comes back in 3-5 seconds with the verified answer.
-
-**You get:** A sentence with the current fact, no hedging from outdated training data.
-
-**Cost:** Less than a cent.
-
----
-
-### 2. "Give me a second opinion" → Devil's Advocate
+### 1. "Give me a second opinion" → Devil's Advocate
 
 You type something like:
 > *"Sanity-check this campaign brief."*
@@ -71,7 +58,7 @@ You type something like:
 
 ---
 
-### 3. "This is a big decision — run a full review" → Boardroom Debate
+### 2. "This is a big decision — run a full review" → Boardroom Debate
 
 This is the headline. The one people install this for.
 
@@ -98,7 +85,7 @@ Three patterns to watch for:
 
 ---
 
-### 4. "I'm torn between options — help me converge" → Round-Table Discussion
+### 3. "I'm torn between options — help me converge" → Round-Table Discussion
 
 You type something like:
 > *"I have three angles for this campaign — help me pick one."*
@@ -149,7 +136,6 @@ Honest numbers, per call:
 
 | Style | Cost | When it's worth it |
 |---|---|---|
-| Quick Web Check | ~$0.001 (less than a tenth of a cent) | Always — facts you'll publish |
 | Devil's Advocate | ~$0.01-0.05 | Non-trivial decisions, stuck problems |
 | Boardroom Debate | ~$0.05-0.08 | High-stakes — anything you can't easily walk back |
 | Round-Table Discussion | ~$0.25 | When 2+ paths look viable and you need to converge |

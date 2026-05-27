@@ -6,16 +6,16 @@
   },
   "metadata": {
     "description": "Cross-check Claude's answers with Gemini + isolated Opus subagent before bothering you. Four review styles, auto-picked by what you type. CLI-only.",
-    "version": "2.0.0",
+    "version": "2.1.0",
     "homepage": "https://github.com/awrshift/skill-dont-ask-me"
   },
   "plugins": [
     {
       "name": "dont-ask-me",
-      "description": "Stop being the bottleneck. Your AI cross-checks itself with Gemini (different model family) and an isolated Opus subagent (same family, no parent context) before answering. Four review styles auto-picked by what you type: Quick Web Check (facts via grounded search), Devil's Advocate (single critique), Boardroom Debate (parallel dual-validation, the headline pattern), Round-Table Discussion (3-round Claude × Gemini brainstorm for multi-option convergence). Two-model setup: 3.5 Flash primary, 3.1 Pro fallback. CLI-only, no MCP. Merges previous skill-gemini + skill-brainstorm into one.",
+      "description": "Stop being the bottleneck. Your AI cross-checks itself with Gemini (different model family) and an isolated Opus subagent (same family, no parent context) before answering. Three review styles auto-picked by what you type: Devil's Advocate (single critique), Boardroom Debate (parallel dual-validation, the headline pattern), Round-Table Discussion (3-round Claude × Gemini brainstorm for multi-option convergence). Two-model setup: 3.5 Flash primary, 3.1 Pro fallback. CLI-only, no MCP. Merges previous skill-gemini + skill-brainstorm into one.",
       "source": "./",
       "strict": false,
-      "version": "2.0.0",
+      "version": "2.1.0",
       "category": "productivity",
       "keywords": [
         "second-opinion",

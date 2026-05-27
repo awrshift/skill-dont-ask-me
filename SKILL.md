@@ -1,12 +1,12 @@
 ---
 name: dont-ask-me
-description: "Cross-check Claude's answers with a second AI before bothering the user. Use when the user says 'second opinion', 'sanity check', 'cross-check', 'verify this', 'am I missing something', 'fact-check', 'is this current', 'dual validation', 'stress-test', 'review this', 'devil's advocate', 'boardroom debate', 'run a full review', 'this is important', 'big decision', 'high-stakes', 'check before I send', 'before publishing', 'brainstorm options', 'help me choose between', 'I have several options', 'I have N angles', 'multiple paths', 'diverge and converge', 'multi-round brainstorm', 'ask Gemini', 'ask Opus', or any Russian equivalents: 'второе мнение', 'проверь', 'проверь факт', 'не уверен', 'спроси Gemini', 'спроси Опус', 'критикуй', 'найди слепые пятна', 'помоги выбрать', 'обсуди варианты', 'это важное решение', 'прогони полную проверку'. Four review styles — Quick Web Check (facts), Devil's Advocate (single critique), Boardroom Debate (parallel dual validation, HEADLINE), Round-Table Discussion (3-round brainstorm for multi-option convergence). Two model families (Gemini + isolated Claude Opus subagent) catch different blind spots."
+description: "Cross-check Claude's answers with a second AI before bothering the user. Use when the user says 'second opinion', 'sanity check', 'cross-check', 'am I missing something', 'dual validation', 'stress-test', 'review this', 'devil's advocate', 'boardroom debate', 'run a full review', 'this is important', 'big decision', 'high-stakes', 'check before I send', 'before publishing', 'brainstorm options', 'help me choose between', 'I have several options', 'I have N angles', 'multiple paths', 'diverge and converge', 'multi-round brainstorm', 'ask Gemini', 'ask Opus', 'critique this', or any Russian equivalents: 'второе мнение', 'не уверен', 'спроси Gemini', 'спроси Опус', 'критикуй', 'найди слепые пятна', 'помоги выбрать', 'обсуди варианты', 'это важное решение', 'прогони полную проверку'. Three review styles — Devil's Advocate (single critique), Boardroom Debate (parallel dual validation, HEADLINE), Round-Table Discussion (3-round brainstorm for multi-option convergence). Two model families (Gemini + isolated Claude Opus subagent) catch different blind spots. NOT for factual lookups — use Claude Code's native WebSearch instead."
 allowed-tools: Bash, Read, Glob, Grep, Task, Write
 ---
 
 # Don't Ask Me — Stop being the bottleneck
 
-Your AI cross-checks itself with another AI before bothering you. Four review styles, picked automatically based on what the user typed. Two independent model families (Gemini + isolated Claude Opus subagent) catch different blind spots than one model alone.
+Your AI cross-checks itself with another AI before bothering you. Three review styles, picked automatically based on what the user typed. Two independent model families (Gemini + isolated Claude Opus subagent) catch different blind spots than one model alone.
 
 ## What this does (in one sentence)
 
@@ -14,38 +14,20 @@ When the user is unsure, asks a high-stakes question, or proposes a decision tha
 
 ## When to invoke
 
-Five trigger conditions. If any fire, pick the matching review style (see § Style Router below).
+Four trigger conditions. If any fire, pick the matching review style (see § Style Router below).
 
-1. **User asked to verify a fact** — version, price, statistic, recent event → Quick Web Check
-2. **User has 2+ viable paths to choose between** — architecture options, technology choice, content angle → Round-Table Discussion
-3. **High-stakes design decision** — ADR, architecture, launch copy, anything with rollback cost → Boardroom Debate DEFAULT
-4. **User stuck on the same problem ≥2 attempts** — failed fix, failed retry, considering adding complexity → Devil's Advocate
-5. **Non-trivial proposal awaiting user approval** — new module, refactor plan, multi-step migration → Devil's Advocate or Boardroom Debate depending on stakes
+1. **User has 2+ viable paths to choose between** — architecture options, technology choice, content angle → Round-Table Discussion
+2. **High-stakes design decision** — ADR, architecture, launch copy, anything with rollback cost → Boardroom Debate DEFAULT
+3. **User stuck on the same problem ≥2 attempts** — failed fix, failed retry, considering adding complexity → Devil's Advocate
+4. **Non-trivial proposal awaiting user approval** — new module, refactor plan, multi-step migration → Devil's Advocate or Boardroom Debate depending on stakes
 
 If none fire, do not invoke this skill — single-model answer suffices for routine work.
 
-## The four review styles
+**Out of scope:** factual lookups ("what's the latest X version?", "is Y still free?") — use Claude Code's native WebSearch tool instead. This skill is about critique and adversarial validation, not fact retrieval.
 
-### 1. Quick Web Check
+## The three review styles
 
-**Trigger phrases:** "проверь факт", "is this current", "check the version", "verify the price", "what's the latest"
-
-**Tool:** `gemini.py ask --grounded`
-**Model:** `gemini-3.5-flash` with Google Search enabled
-**Latency:** 3-5 seconds
-**Cost:** $ (cheapest tier)
-
-**Use when:** any factual claim that affects the user's output. Library version, pricing, regulation status, current event.
-
-**Example:**
-```
-User: "Is Next.js 16 still in beta?"
-Claude internally runs: gemini.py ask "Next.js 16 release status" --grounded
-Returns: "16.1 stable as of Oct 2025, 16.2 in canary."
-Claude reports: "No — 16.1 went stable in October. 16.2 is the current canary."
-```
-
-### 2. Devil's Advocate (Single Critique)
+### 1. Devil's Advocate (Single Critique)
 
 **Trigger phrases:** "дай второе мнение", "sanity check this", "am I missing something", "stress-test this", "критикуй", "найди слепые пятна"
 
@@ -78,7 +60,7 @@ Agent(
 )
 ```
 
-### 3. Boardroom Debate (Dual Validation) — THE HEADLINE PATTERN
+### 2. Boardroom Debate (Dual Validation) — THE HEADLINE PATTERN
 
 **Trigger phrases:** "прогони dual-validation", "это важное решение", "high-stakes review", "give me two independent opinions", "boardroom debate"
 
@@ -120,7 +102,7 @@ Agent(
 **Latency:** 15-30 seconds (parallel)
 **Cost:** $$$ tier
 
-### 4. Round-Table Discussion (3-Round Brainstorm)
+### 3. Round-Table Discussion (3-Round Brainstorm)
 
 **Trigger phrases:** "помоги выбрать", "brainstorm options", "we have several paths", "diverge then converge", "multi-round brainstorm", "обсуди варианты"
 
@@ -155,12 +137,13 @@ Phase 4: Synthesize — summary table + final recommendation + kill list
 
 Decision tree, evaluated top-down:
 
-1. Is the user asking to verify a fact (version, price, statistic, recent event)? → **Quick Web Check**
-2. Is this a high-stakes design decision (ADR, architecture, launch copy, anything with meaningful rollback cost)? → **Boardroom Debate DEFAULT**
-3. Are there 2+ viable paths to choose between with no clear winner? → **Round-Table Discussion**
-4. Otherwise — stuck on a problem, need critique on a non-trivial proposal, want sanity check? → **Devil's Advocate**
+1. Is this a high-stakes design decision (ADR, architecture, launch copy, anything with meaningful rollback cost)? → **Boardroom Debate DEFAULT**
+2. Are there 2+ viable paths to choose between with no clear winner? → **Round-Table Discussion**
+3. Otherwise — stuck on a problem, need critique on a non-trivial proposal, want sanity check? → **Devil's Advocate**
    - Pick **Gemini second-opinion** if claim is about tech / external world / has different training distribution
    - Pick **idea-validator Opus** if need to stress-test YOUR reasoning chain without inherited bias
+
+**Out of router:** factual lookups (current version, price, statistic, recent event) → not this skill. Use Claude Code's native WebSearch tool.
 
 ## Critical Evaluation Rule (applies to ALL styles)
 
@@ -210,7 +193,6 @@ Skipping step 1-3 and asking Gemini first = anti-pattern. Codified Session #142 
 
 | Style | Cost per call | When justified |
 |---|---|---|
-| Quick Web Check | ~$0.001 | Always, when factual claim affects output |
 | Devil's Advocate (Gemini) | ~$0.01 | Non-trivial decisions, prompt before finalizing, stuck after ≥2 attempts |
 | Devil's Advocate (Opus subagent) | ~$0.03-0.05 | Reasoning chain stress-test, fresh adversarial perspective |
 | Boardroom Debate (parallel both) | ~$0.05-0.08 | High-stakes: ADR, architecture, launch copy, anything with rollback cost |
@@ -239,8 +221,9 @@ Skipping step 1-3 and asking Gemini first = anti-pattern. Codified Session #142 
 ```bash
 GEMINI="$(find . ~/.claude/skills -name gemini.py -path '*/dont-ask-me/*' 2>/dev/null | head -1)"
 
-# Quick fact check
-python3 $GEMINI ask "What's the latest Next.js version?" --grounded
+# Web-grounded ask (used internally by Round-Table Phase 0.5 + 3.5 for tech verification —
+# NOT a user-facing review style. For factual lookups, use Claude Code's native WebSearch.)
+python3 $GEMINI ask "Verify these technologies: A, B, C" --grounded
 
 # Devil's Advocate — single critique
 python3 $GEMINI second-opinion @prompt.txt --save out.md
