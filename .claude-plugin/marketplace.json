@@ -5,7 +5,7 @@
     "email": "awrshift@proton.me"
   },
   "metadata": {
-    "description": "Cross-check Claude's answers with Gemini + isolated Opus subagent before bothering you. Four review styles, auto-picked by what you type. CLI-only.",
+    "description": "Cross-check Claude's answers with Gemini + isolated Opus subagent before bothering you. Three review styles, auto-picked by what you type. CLI-only.",
     "version": "2.1.0",
     "homepage": "https://github.com/awrshift/skill-dont-ask-me"
   },
@@ -21,7 +21,7 @@
         "second-opinion",
         "dual-validation",
         "cross-check",
-        "fact-check",
+        
         "boardroom-debate",
         "devils-advocate",
         "brainstorm",
